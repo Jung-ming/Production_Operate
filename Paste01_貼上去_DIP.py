@@ -1,6 +1,6 @@
+from datetime import datetime
 import numpy as np
 import pandas as pd
-from Cut04_選擇日期 import *
 
 
 def 抓取待處理足標(data, 目標線別, 起始日期, 結束日期):
@@ -55,6 +55,8 @@ def 插入指定線別(data, columns, 目標線別, 起始日期, 結束日期):
 
 
 def 貼上去_for_DIP(data, 起始日期, 結束日期):
+    起始日期 = datetime.strptime(起始日期, '%Y/%m/%d %H:%M')
+    結束日期 = datetime.strptime(結束日期, '%Y/%m/%d %H:%M')
     columns = data.columns
 
     data = 插入指定線別(data, columns, '2201', 起始日期, 結束日期)
