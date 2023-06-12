@@ -13,7 +13,6 @@ def 抓取待處理足標(data, 目標線別, 起始日期, 結束日期):
     操作足標_其他 = []
     for 足標, 欄位 in FFFF線別.iterrows():
         if 起始日期 <= 欄位['預定開工日'].to_pydatetime() <= 結束日期 and '暫不生產' not in str(欄位['工單備註']):
-            print(足標, 欄位['母工單單號'])
             if '重工' in 欄位['名稱規格']:
                 操作足標_重工.append(足標)
             elif 欄位['備註資訊'] == 'coating':
