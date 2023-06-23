@@ -3,13 +3,14 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog,
     QMessageBox, QProgressDialog
 from PyQt5.QtCore import Qt, QDate
 from PyQt5 import QtWidgets, QtCore
-from Cut03_文件處理 import 文件處理_剪下去, 文件處理_貼上去
+from Cut03_文件處理 import 文件處理_剪下去, 文件處理_貼上去, 文件處理_排程自動化
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
+        self.檔案選擇確認 = False
 
     def initUI(self):
         # 創建一個 QVBoxLayout 佈局
@@ -42,7 +43,7 @@ class MainWindow(QMainWindow):
 
         # 介面標題與大小
         self.setWindowTitle("排程自動化")
-        self.setGeometry(300, 300, 1000, 400)
+        self.setGeometry(300, 300, 1000, 500)
 
         # 按鈕設置與大小
         # 在這個上下文中，self 是一個特殊的參數，它指向正在創建的類的實例。
@@ -56,6 +57,11 @@ class MainWindow(QMainWindow):
         button_貼上去.setStyleSheet("font-size: 16px;font-family: 新細明體;font-weight: bold")
         button_貼上去.setGeometry(400, 200, 200, 30)
         button_貼上去.clicked.connect(self.PasteUp)
+
+        button_排程 = QPushButton("排程自動化", self)
+        button_排程.setStyleSheet("font-size: 16px;font-family: 新細明體;font-weight: bold")
+        button_排程.setGeometry(400, 250, 200, 30)
+        button_排程.clicked.connect(self.AutoOutput)
 
         button_檔案選擇 = QPushButton("檔案選擇", self)
         button_檔案選擇.setStyleSheet("font-size: 16px;font-family: 新細明體;font-weight: bold")
@@ -75,7 +81,34 @@ class MainWindow(QMainWindow):
         date_range_picker = DateRangePicker()
         layout.addWidget(date_range_picker)
 
+    def AutoOutput(self):
+        if not self.檔案選擇確認:
+            QMessageBox.warning(self, "警告", "請先選擇文件！")
+            return
+
+        confirm = QtWidgets.QMessageBox.question(self, "確認", "即將開始自動計算排程時間，請確認日期與文件設定正確!",
+                                                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if confirm == QtWidgets.QMessageBox.Yes:
+            try:
+                if 文件路徑:
+                    dialog = QProgressDialog("文件處理中，請稍後...", None, 0, 0, self)
+                    dialog.setWindowModality(Qt.WindowModal)
+                    dialog.setWindowTitle("Loading")
+                    dialog.setCancelButton(None)
+                    dialog.show()
+                    文件處理_排程自動化(文件路徑, 起始日期, 結束日期)
+                    dialog.close()
+                    QMessageBox.information(self, '結果', '文件處理完成!')
+            except Exception as e:
+                # 異常處理
+                QMessageBox.critical(self, "錯誤", f"發生錯誤：{str(e)}")
+                print(f"錯誤：{str(e)}")
+
     def CutDown(self):
+        if not self.檔案選擇確認:
+            QMessageBox.warning(self, "警告", "請先選擇文件！")
+            return
+
         confirm = QtWidgets.QMessageBox.question(self, "確認", "是否確定剪切？ 請確認日期與文件設定正確!",
                                                  QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if confirm == QtWidgets.QMessageBox.Yes:
@@ -93,9 +126,12 @@ class MainWindow(QMainWindow):
                 # 異常處理
                 QMessageBox.critical(self, "錯誤", f"發生錯誤：{str(e)}")
                 print(f"錯誤：{str(e)}")
-                # 可選擇終止程序
 
     def PasteUp(self):
+        if not self.檔案選擇確認:
+            QMessageBox.warning(self, "警告", "請先選擇文件！")
+            return
+
         confirm = QtWidgets.QMessageBox.question(self, "確認", "是否確定貼上？ 請確認日期與文件設定正確!",
                                                  QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if confirm == QtWidgets.QMessageBox.Yes:
@@ -116,11 +152,13 @@ class MainWindow(QMainWindow):
 
     def selectFile(self):
         global 文件路徑
+
         # 創建一個 QFileDialog 的實例，用於顯示文件對話框。
         文件選擇視窗 = QFileDialog()
 
         # 使用變數 file_path 來接收文件路徑，而 _ 變數表示我們不關心文件類型
         文件路徑, _ = 文件選擇視窗.getOpenFileName(self, "選擇檔案")
+        self.檔案選擇確認 = 文件路徑
         self.file_label.setText(f"選擇的文件：{文件路徑}")
 
 
@@ -139,7 +177,7 @@ class DateRangePicker(QtWidgets.QWidget):
         # QtWidgets.QDateEdit() 函數內可設置預設日期
         self.start_date_edit = QtWidgets.QDateEdit(QtCore.QDate.currentDate())
         self.start_date_edit.setCalendarPopup(True)
-        self.start_date_edit.setFixedWidth(100)
+        self.start_date_edit.setFixedWidth(110)
         self.start_date_edit.setStyleSheet("font-size: 18px;font-Family: Times New Roman")
         layout.addWidget(self.start_date_edit)
 
@@ -149,7 +187,7 @@ class DateRangePicker(QtWidgets.QWidget):
         # 創建結束日期的 QDateEdit
         self.end_date_edit = QtWidgets.QDateEdit(default_end_date)
         self.end_date_edit.setCalendarPopup(True)
-        self.end_date_edit.setFixedWidth(100)
+        self.end_date_edit.setFixedWidth(110)
         self.end_date_edit.setStyleSheet("font-size: 18px;font-Family: Times New Roman")
         layout.addWidget(self.end_date_edit)
 
@@ -158,12 +196,8 @@ class DateRangePicker(QtWidgets.QWidget):
             "font-size: 16px;border: 3px double black; background-color: white; padding: 5px;")
         self.date_label.setMinimumSize(150, 40)  # 設置方框的最小大小
         layout.addWidget(self.date_label, alignment=Qt.AlignCenter)
-        # 創建一個按鈕用於確認選擇日期區間
-        # confirm_button = QtWidgets.QPushButton("確定")
-        # layout.addWidget(confirm_button)
 
         # 連接按鈕的點擊事件到槽函數
-        # confirm_button.clicked.connect(self.confirmDateRange)
         self.start_date_edit.dateChanged.connect(self.updateDateRange)
         self.end_date_edit.dateChanged.connect(self.updateDateRange)
 
@@ -191,15 +225,6 @@ class DateRangePicker(QtWidgets.QWidget):
         結束日期 = self.end_date_edit.date().toString("yyyy/MM/dd 00:00")
 
         self.date_label.setText(f'起始日期: {起始日期}\n結束日期: {結束日期}')
-    # def confirmDateRange(self):
-    #     # 獲取選擇的起始日期和結束日期
-    #     global 起始日期, 結束日期
-    #     起始日期 = self.start_date_edit.date()
-    #     結束日期 = self.end_date_edit.date()
-    #     起始日期 = 起始日期.toString("yyyy/MM/dd 00:00")
-    #     結束日期 = 結束日期.toString("yyyy/MM/dd 00:00")
-    #     self.date_label.setText(f'起始日期: {起始日期}\n結束日期: {結束日期}')
-    # self.date_label.setGeometry()
 
 
 # 這是 Python 中的慣用語法，表示如果這個程式碼是直接被執行而不是被當作模組引入，則執行下面的程式碼塊
