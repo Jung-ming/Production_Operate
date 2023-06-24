@@ -247,17 +247,20 @@ def 自動排程時間_DIP(data, 目標日期區間):
 
         # 此部分為抓出開始時間，並依據各種條件判斷，填入Output時間
         for index, row in data.iterrows():
-            if row['線別'] in ['2201', '2202']:
+            if row['線別'] in ['2201', '2202'] and \
+                    row['結束時間'].date().strftime("%#m/%#d") == 日期.date().strftime("%#m/%#d"):
                 data = 押Output時間(data, index, row, 日期)
 
         # 此部分為成品時間
         for index, row in data.iterrows():
-            if row['線別'] in ['2201', '2202']:
+            if row['線別'] in ['2201', '2202'] and \
+                    row['結束時間'].date().strftime("%#m/%#d") == 日期.date().strftime("%#m/%#d"):
                 data = 押成品時間(data, index, row)
 
         # 此部分為TEST時間
         for index, row in data.iterrows():
-            if row['線別'] == '2201' or row['線別'] == '2202':
+            if row['線別'] == '2201' or row['線別'] == '2202' and \
+                    row['結束時間'].date().strftime("%#m/%#d") == 日期.date().strftime("%#m/%#d"):
                 data = 押測試時間(data, index, row)
 
     return data
@@ -290,27 +293,3 @@ def 自動排程時間_SMT(data, 目標日期區間):
     return data
 
 
-# 將更新後的資料寫回Excel檔案
-
-
-# """  主流程  """
-#
-# # 2023/5/13
-# if __name__ == "__main__":
-#     data = filedialog.askopenfilename()
-#
-#     目標日期區間 = 取得日期區間(起始日期, 結束日期)
-#     # 讀取檔案
-#     data_DIP = pd.read_excel(data, header=1, sheet_name='DIP')
-#     data_SMT = pd.read_excel(data, header=1, sheet_name='SMT')
-#
-#     # 新增判斷用欄位
-#     data_DIP = data_DIP.assign(判斷用時間_給測試用=None, 填寫註記_1=None, 填寫註記_2=None, 填寫註記_3=None, 填寫註記_4=None)
-#     data_SMT = data_SMT.assign(判斷用時間_給測試用=None, 填寫註記_1=None, 填寫註記_2=None, 填寫註記_3=None, 填寫註記_4=None)
-#
-#     # 根據條件自動產生Output
-#     data_DIP = 自動排程時間_DIP(data_DIP)
-#     data_SMT = 自動排程時間_SMT(data_SMT)
-#
-#     # 將排好時間的資料寫入Excel
-#     排程時間寫入([data_DIP, data_SMT])

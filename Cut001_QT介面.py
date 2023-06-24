@@ -90,15 +90,14 @@ class MainWindow(QMainWindow):
                                                  QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if confirm == QtWidgets.QMessageBox.Yes:
             try:
-                if 文件路徑:
-                    dialog = QProgressDialog("文件處理中，請稍後...", None, 0, 0, self)
-                    dialog.setWindowModality(Qt.WindowModal)
-                    dialog.setWindowTitle("Loading")
-                    dialog.setCancelButton(None)
-                    dialog.show()
-                    文件處理_排程自動化(文件路徑, 起始日期, 結束日期)
-                    dialog.close()
-                    QMessageBox.information(self, '結果', '文件處理完成!')
+                dialog = QProgressDialog("文件處理中，請稍後...", None, 0, 0, self)
+                dialog.setWindowModality(Qt.WindowModal)
+                dialog.setWindowTitle("Loading")
+                dialog.setCancelButton(None)
+                dialog.show()
+                文件處理_排程自動化(文件路徑, 起始日期, 結束日期)
+                dialog.close()
+                QMessageBox.information(self, '結果', '文件處理完成!')
             except Exception as e:
                 # 異常處理
                 QMessageBox.critical(self, "錯誤", f"發生錯誤：{str(e)}")
@@ -113,15 +112,14 @@ class MainWindow(QMainWindow):
                                                  QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if confirm == QtWidgets.QMessageBox.Yes:
             try:
-                if 文件路徑:
-                    dialog = QProgressDialog("文件處理中，請稍後...", None, 0, 0, self)
-                    dialog.setWindowModality(Qt.WindowModal)
-                    dialog.setWindowTitle("Loading")
-                    dialog.setCancelButton(None)
-                    dialog.show()
-                    文件處理_剪下去(文件路徑, 起始日期)
-                    dialog.close()
-                    QMessageBox.information(self, '結果', '文件處理完成!')
+                dialog = QProgressDialog("文件處理中，請稍後...", None, 0, 0, self)
+                dialog.setWindowModality(Qt.WindowModal)
+                dialog.setWindowTitle("Loading")
+                dialog.setCancelButton(None)
+                dialog.show()
+                文件處理_剪下去(文件路徑, 起始日期)
+                dialog.close()
+                QMessageBox.information(self, '結果', '文件處理完成!')
             except Exception as e:
                 # 異常處理
                 QMessageBox.critical(self, "錯誤", f"發生錯誤：{str(e)}")
@@ -136,15 +134,14 @@ class MainWindow(QMainWindow):
                                                  QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         if confirm == QtWidgets.QMessageBox.Yes:
             try:
-                if 文件路徑:
-                    dialog = QProgressDialog("文件處理中，請稍後...", None, 0, 0, self)
-                    dialog.setWindowModality(Qt.WindowModal)
-                    dialog.setWindowTitle("Loading")
-                    dialog.setCancelButton(None)
-                    dialog.show()
-                    文件處理_貼上去(文件路徑, 起始日期, 結束日期)
-                    dialog.close()
-                    QMessageBox.information(self, '結果', '文件處理完成!')
+                dialog = QProgressDialog("文件處理中，請稍後...", None, 0, 0, self)
+                dialog.setWindowModality(Qt.WindowModal)
+                dialog.setWindowTitle("Loading")
+                dialog.setCancelButton(None)
+                dialog.show()
+                文件處理_貼上去(文件路徑, 起始日期, 結束日期)
+                dialog.close()
+                QMessageBox.information(self, '結果', '文件處理完成!')
             except Exception as e:
                 # 異常處理
                 QMessageBox.critical(self, "錯誤", f"發生錯誤：{str(e)}")
