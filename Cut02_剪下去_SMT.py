@@ -95,4 +95,8 @@ def 剪下去_for_SMT(data, 目標日期):
 
     data = 全部剪下流程(data, '2105', '9105', columns, SMT判斷日期)
 
+    data = 全部剪下流程(data, '2106', '9106', columns, SMT判斷日期)
+
+    data = 全部剪下流程(data, '2107', '9107', columns, SMT判斷日期)
+
     return data

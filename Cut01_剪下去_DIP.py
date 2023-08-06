@@ -8,10 +8,13 @@ def 目標項目線別下移(data, 初始線別, 目標線別, 判斷日期):
     # [-1]可以直接選擇最後一個足標和取得工序最末項
     # 取得這兩者的用意在於，從9201(目標線別)的最後一項開始插入，並且工序也是從最末項開始遞增
 
+    # 設定當目標縣別為空時，替代的目標線別
     if 目標線別 == '9201':
         操作用目標線別 = 'FFFF'
     else:
         操作用目標線別 = str(int(目標線別) - 1)
+
+    # 判斷目標線別是否為空，是否需要採用替代的目標線別
     if data_目標線別.empty:
         if 操作用目標線別 == 'FFFF':
             data_目標線別 = data.query(f'線別 == "{操作用目標線別}"')
@@ -29,7 +32,7 @@ def 目標項目線別下移(data, 初始線別, 目標線別, 判斷日期):
 
     # 將符合條件的項目從2201(初始線別)剪到9201(目標線別)
     for 足標, 欄位 in data.iterrows():
-        if 欄位['線別'] == 初始線別 and 欄位['結束時間'].to_pydatetime() <= 判斷日期:
+        if 欄位['線別'] == 初始線別 and 欄位['開始時間'].to_pydatetime() < 判斷日期:
             待刪除足標.append(足標)
             data = 更新線別和工序_9開頭(欄位, 目標線別, 工序最末項, data, 目標線別最後足標)
             工序最末項 += 1
@@ -83,7 +86,7 @@ def 全部剪下流程(data, 初始線別, 目標線別, columns, 判斷日期):
 
 def 剪下去_for_DIP(data, 目標日期):
     DIP判斷日期 = datetime.strptime(目標日期, '%Y/%m/%d %H:%M').replace(hour=8, minute=30)
-    print('選中時間', DIP判斷日期)
+    DIP判斷日期_2205 = datetime.strptime(目標日期, '%Y/%m/%d %H:%M').replace(hour=8, minute=00)
 
     # 給後面重新賦予列名用
     columns = data.columns
@@ -91,5 +94,7 @@ def 剪下去_for_DIP(data, 目標日期):
     data = 全部剪下流程(data, '2201', '9201', columns, DIP判斷日期)
 
     data = 全部剪下流程(data, '2202', '9202', columns, DIP判斷日期)
+
+    data = 全部剪下流程(data, '2205', '9205', columns, DIP判斷日期_2205)
 
     return data

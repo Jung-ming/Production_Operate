@@ -1,10 +1,10 @@
 from Cut001_QT介面 import *
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QApplication
 
 
 app = QApplication(sys.argv)
-window = MainWindow()
+window = 主介面()
 window.show()
 app.exec_()
 

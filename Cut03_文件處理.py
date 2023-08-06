@@ -26,49 +26,52 @@ def 獲取桌面路徑():
         return 目錄.replace('\\', '/')
 
 
-def 文件處理_剪下去(文件路徑, 目標日期):
+def 文件讀取(文件路徑):
     data_DIP = pd.read_excel(f'{文件路徑}', header=1, sheet_name='DIP')
     data_SMT = pd.read_excel(f'{文件路徑}', header=1, sheet_name='SMT')
-    data_DIP = 剪下去_for_DIP(data_DIP, 目標日期)
-    data_SMT = 剪下去_for_SMT(data_SMT, 目標日期)
 
-    桌面路徑 = 獲取桌面路徑()
-    當天日期_文字格式 = datetime.datetime.now().strftime('%y%m%d%H%M')
-    輸出檔名 = '剪下結果' + 當天日期_文字格式 + '.xlsx'
-    writer = pd.ExcelWriter(f'{桌面路徑}/{輸出檔名}', engine='xlsxwriter')
-
-    data_DIP.to_excel(writer, index=False, sheet_name='DIP')
-    data_SMT.to_excel(writer, index=False, sheet_name='SMT')
-
-    writer.close()
+    return data_DIP, data_SMT
 
 
-def 文件處理_貼上去(文件路徑, 起始日期, 結束日期):
-    data_DIP = pd.read_excel(f'{文件路徑}', header=1, sheet_name='DIP')
-    data_SMT = pd.read_excel(f'{文件路徑}', header=1, sheet_name='SMT')
-    data_DIP = 貼上去_for_DIP(data_DIP, 起始日期, 結束日期)
-    data_SMT = 貼上去_for_SMT(data_SMT, 起始日期, 結束日期)
+def 文件處理_剪下去(待處理文件, 目標日期):
+    data_DIP = 剪下去_for_DIP(待處理文件[0], 目標日期)
+    data_SMT = 剪下去_for_SMT(待處理文件[1], 目標日期)
 
-    桌面路徑 = 獲取桌面路徑()
-    當天日期_文字格式 = datetime.datetime.now().strftime('%y%m%d%H%M')
-    輸出檔名 = '貼上結果' + 當天日期_文字格式 + '.xlsx'
-    writer = pd.ExcelWriter(f'{桌面路徑}/{輸出檔名}', engine='xlsxwriter')
+    return data_DIP, data_SMT
 
-    data_DIP.to_excel(writer, index=False, sheet_name='DIP')
-    data_SMT.to_excel(writer, index=False, sheet_name='SMT')
 
-    writer.close()
+def 文件處理_貼上去(待處理文件, 起始日期, 結束日期, DIP客戶名單, SMT客戶名單, 抓取四零四, 抓取其他客戶):
+    # 資料內的客戶欄位與選單給的客戶選項有些微差異，
+    # 因此要把符合的字串另外取出
+    for 足標, 客戶 in enumerate(DIP客戶名單):
+        if '-' not in 客戶:
+            pass
+        else:
+            DIP客戶名單[足標] = 客戶.split('-')[1]
+
+    for 客戶列足標, 客戶列 in enumerate(SMT客戶名單):
+        for 足標, 客戶 in enumerate(客戶列):
+            if '-' not in 客戶:
+                pass
+            else:
+                客戶列[足標] = 客戶.split('-')[1]
+        SMT客戶名單[客戶列足標] = 客戶列
+
+    data_DIP = 貼上去_for_DIP(待處理文件[0], 起始日期, 結束日期, DIP客戶名單, 抓取四零四, 抓取其他客戶)
+    data_SMT = 貼上去_for_SMT(待處理文件[1], 起始日期, 結束日期, SMT客戶名單, 抓取四零四, 抓取其他客戶)
+
+    return data_DIP, data_SMT
 
 
 def 排程時間寫入(data):
     工作表名稱 = ['DIP', 'SMT']
-    隱藏行 = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-           'L', 'M', 'O', 'P', 'Q', 'R', 'S',
-           'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB',
-           'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ',
-           'AM', 'AN', 'AO', 'AV', 'AW', 'AX', 'AY', 'AZ',
-           'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH',
-           'BI', 'BJ', 'BK', 'BL', 'BM', 'BO']
+    # 隱藏行 = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+    #        'L', 'M', 'O', 'P', 'Q', 'R', 'S',
+    #        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB',
+    #        'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ',
+    #        'AM', 'AN', 'AO', 'AV', 'AW', 'AX', 'AY', 'AZ',
+    #        'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH',
+    #        'BI', 'BJ', 'BK', 'BL', 'BM', 'BO']
 
     桌面路徑 = 獲取桌面路徑()
     當天日期_文字格式 = datetime.datetime.now().strftime('%y%m%d%H%M')
@@ -84,8 +87,8 @@ def 排程時間寫入(data):
         工作表.to_excel(writer, sheet_name=工作表名稱[足標], index=False)
         worksheet = writer.sheets[工作表名稱[足標]]
 
-        for 隱藏 in 隱藏行:
-            worksheet.set_column(f'{隱藏}:{隱藏}', None, None, {'hidden': True})
+        # for 隱藏 in 隱藏行:
+        #     worksheet.set_column(f'{隱藏}:{隱藏}', None, None, {'hidden': True})
         # AP 41 DIP首件
         # AQ 42 Output
         # 43 TSET
@@ -128,3 +131,26 @@ def 文件處理_排程自動化(data, 起始日期, 結束日期):
 
     # 將排好時間的資料寫入Excel
     排程時間寫入([data_DIP, data_SMT])
+
+
+def 文件輸出(待處理文件):
+    桌面路徑 = 獲取桌面路徑()
+    當天日期_文字格式 = datetime.datetime.now().strftime('%y%m%d%H%M')
+    輸出檔名 = '輸出結果' + 當天日期_文字格式 + '.xlsx'
+    writer = pd.ExcelWriter(f'{桌面路徑}/{輸出檔名}', engine='xlsxwriter')
+
+    待處理文件[0].to_excel(writer, index=False, sheet_name='DIP')
+    待處理文件[1].to_excel(writer, index=False, sheet_name='SMT')
+
+    writer.close()
+
+
+if __name__ == "__main__":
+    data_DIP = pd.read_excel('Production schedule 20230608.xls', header=1, sheet_name='DIP')
+    data_SMT = pd.read_excel('Production schedule 20230608.xls', header=1, sheet_name='SMT')
+
+    目標日期 = '2023/06/09 00:00'
+    data_DIP = 文件處理_剪下去(data_DIP, 目標日期)
+    data_SMT = 文件處理_剪下去(data_SMT, 目標日期)
+    待處理文件 = [data_DIP, data_SMT]
+    文件輸出(待處理文件)
